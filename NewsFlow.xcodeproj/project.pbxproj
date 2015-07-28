@@ -21,6 +21,7 @@
 		D8E650FC1B66AF26001805A9 /* FlowCell0.png in Resources */ = {isa = PBXBuildFile; fileRef = D8E650F91B66AF26001805A9 /* FlowCell0.png */; };
 		D8E650FF1B66B282001805A9 /* StoryManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8E650FE1B66B282001805A9 /* StoryManager.swift */; };
 		D8E651031B67C14D001805A9 /* NewsItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8E651021B67C14D001805A9 /* NewsItem.swift */; };
+		D8E651051B680059001805A9 /* README.md in Sources */ = {isa = PBXBuildFile; fileRef = D8E651041B680059001805A9 /* README.md */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -52,6 +53,7 @@
 		D8E650F91B66AF26001805A9 /* FlowCell0.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = FlowCell0.png; sourceTree = "<group>"; };
 		D8E650FE1B66B282001805A9 /* StoryManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StoryManager.swift; sourceTree = "<group>"; };
 		D8E651021B67C14D001805A9 /* NewsItem.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NewsItem.swift; sourceTree = "<group>"; };
+		D8E651041B680059001805A9 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -129,6 +131,7 @@
 		D8E650DF1B66AEBF001805A9 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				D8E651041B680059001805A9 /* README.md */,
 				D8E650E01B66AEBF001805A9 /* Info.plist */,
 			);
 			name = "Supporting Files";
@@ -261,6 +264,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D8E651051B680059001805A9 /* README.md in Sources */,
 				D8E650E21B66AEBF001805A9 /* NewsFlowTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
