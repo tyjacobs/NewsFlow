@@ -137,7 +137,7 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="nrQ-Ni-ARR" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="796" y="547"/>
+            <point key="canvasLocation" x="669.75" y="546"/>
         </scene>
         <!--Story Detail-->
         <scene sceneID="QKb-Mj-Rv1">
@@ -153,10 +153,10 @@
                         <subviews>
                             <webView contentMode="scaleToFill" scalesPageToFit="YES" translatesAutoresizingMaskIntoConstraints="NO" id="8JW-Q4-6PG">
                                 <rect key="frame" x="-4" y="0.0" width="422" height="736"/>
-                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <color key="backgroundColor" red="0.10588236149999999" green="0.57647061349999995" blue="0.77254909279999995" alpha="1" colorSpace="deviceRGB"/>
                             </webView>
                         </subviews>
-                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <color key="backgroundColor" red="0.10588236149999999" green="0.57647061349999995" blue="0.77254909279999995" alpha="1" colorSpace="deviceRGB"/>
                         <constraints>
                             <constraint firstAttribute="trailingMargin" secondItem="8JW-Q4-6PG" secondAttribute="trailing" constant="-20" id="3kZ-I6-JNI"/>
                             <constraint firstItem="8JW-Q4-6PG" firstAttribute="top" secondItem="8Hl-el-pkr" secondAttribute="topMargin" id="5J3-tc-Huq"/>
@@ -172,7 +172,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="BgG-nT-mQx" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1276" y="547"/>
+            <point key="canvasLocation" x="1011.75" y="546"/>
         </scene>
         <!--Navigation-->
         <scene sceneID="qjk-5B-hI8">

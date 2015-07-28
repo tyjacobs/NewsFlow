@@ -8,6 +8,7 @@
 
 import UIKit
 
+// this custom table view cell is used for the entries in the main table
 class TableViewCell: UITableViewCell {
     
     @IBOutlet weak var titleLabel: UILabel?

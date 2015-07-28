@@ -8,6 +8,7 @@
 
 import UIKit
 
+// this view controller is used when the user drills down into the detail for a story
 class DetailViewController: UIViewController {
 
     @IBOutlet weak var webView: UIWebView?

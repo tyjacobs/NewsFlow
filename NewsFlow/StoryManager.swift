@@ -11,10 +11,14 @@ import SystemConfiguration
 import CoreData
 import UIKit
 
+// classes interested in being notified when the story list is updated should
+// implement this protocol and register as a listener on the StoryManager singleton
 protocol StoryListener {
     func storiesChanged()
 }
 
+// this singleton class manages the list of cached and dynamically retrieved news items
+// use StoryManager.sharedInstance, call addListener(), and then retrieveAllNewsItems()
 class StoryManager: NSObject, NSURLConnectionDelegate
 {
     static let sharedInstance = StoryManager()
@@ -32,8 +36,13 @@ class StoryManager: NSObject, NSURLConnectionDelegate
         listeners.append(listener)
     }
 
+    private var reloading = false
     func retrieveAllNewsItems()
     {
+        // we must prevent the retrieval from running multiple times in parallel, lest jsondata get corrupted
+        if reloading { return }
+        reloading = true
+
         // start by retrieving all existing, non-archived news stories from the database and adding those to allNewsItems
         allNewsItems = []
         let fetchRequest = NSFetchRequest(entityName: "NewsItem")
@@ -47,6 +56,7 @@ class StoryManager: NSObject, NSURLConnectionDelegate
         if connectedToNetwork()
         {
             // attempt to retrieve stories from the rss feed, store any new stories in database, then notify listeners
+            jsondata = NSMutableData()
             var url: NSURL = NSURL(string:StoryManager.feedURLString)!
             var request: NSURLRequest = NSURLRequest(URL: url)
             var connection: NSURLConnection = NSURLConnection(request: request, delegate: self, startImmediately: true)!
@@ -57,6 +67,7 @@ class StoryManager: NSObject, NSURLConnectionDelegate
             for listener in listeners {
                 listener.storiesChanged()
             }
+            reloading = false
         }
     }
     
@@ -91,15 +102,17 @@ class StoryManager: NSObject, NSURLConnectionDelegate
             }
         }
         
-        // TO DO before notifying listeners, sort the news items by date
+        // TO DO: before notifying listeners, sort the news items by date
         //self.allNewsItems.sort({ $0.dateStamp > $1.dateStamp })
         
         // notify listeners
         for listener in listeners {
             listener.storiesChanged()
         }
+        reloading = false
     }
 
+    // add a new news item to the database (and cached list), if it does not already exist
     func addNewsItem(newsItemData: NSDictionary) {
         
         // extract the various parts of the news item
@@ -133,6 +146,7 @@ class StoryManager: NSObject, NSURLConnectionDelegate
         }
     }
 
+    // return the matching news item, or nil if it does not exist
     func getNewsItemForTitle(title: String) -> NewsItem? {
         
         // for now, a news item is uniquely identified by its title
@@ -152,6 +166,7 @@ class StoryManager: NSObject, NSURLConnectionDelegate
         return returnNewsItem
     }
     
+    // this is a utility function to check whether the device currently has network access
     func connectedToNetwork() -> Bool {
         
         var zeroAddress = sockaddr_in()

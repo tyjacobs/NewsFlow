@@ -12,33 +12,80 @@ class TableViewController: UITableViewController, StoryListener {
 
     var items = NSMutableArray()
     var jsondata: NSMutableData = NSMutableData()
-
+    let activityView = UIActivityIndicatorView(frame: CGRectMake(0, 0, 40, 40))
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
         // add a pretty image to the navigation bar
         var navBar: UINavigationBar = self.navigationController!.navigationBar
         navBar.setBackgroundImage(UIImage(named: "WaterTop.png")!.resizableImageWithCapInsets(UIEdgeInsetsMake(0, 0, 0, 0), resizingMode: .Stretch), forBarMetrics: .Default)
+        
+        // install the activity view as the table header, but hide it initially
+        self.tableView.tableHeaderView = activityView
+        let insets = self.tableView.contentInset;
+        let newInsets: UIEdgeInsets = UIEdgeInsetsMake(insets.top - CGFloat(40), insets.left, insets.bottom, insets.right)
+        self.tableView.contentInset = newInsets;
 
         // register to get notified when the story list is populated or changes
         StoryManager.sharedInstance.addListener(self);
         
+        reloadStories()
+    }
+    
+    private var reloading = false
+    func reloadStories() {
+        reloading = true
+
         // retrieve all news items - this will invoke storiesChanged() when complete
         StoryManager.sharedInstance.retrieveAllNewsItems();
         
-        // TO DO - start progress indicator
+        // expose the activity indicator just above the table
+        let insets = self.tableView.contentInset;
+        let newInsets: UIEdgeInsets = UIEdgeInsetsMake(insets.top + CGFloat(40), insets.left, insets.bottom, insets.right)
+        self.tableView.contentInset = newInsets;
+        
+        activityView.startAnimating()
     }
         
     func storiesChanged() {
-        // TO DO - stop progress indicator
+
+        // this is called when the stories are done loading
+        // stop and hide the activity indicator above the table and reload the table
+        reloading = false
+        activityView.stopAnimating()
         
+        UIView.animateWithDuration(0.4, animations: {
+            let insets = self.tableView.contentInset;
+            let newInsets: UIEdgeInsets = UIEdgeInsetsMake(insets.top - CGFloat(40), insets.left, insets.bottom, insets.right)
+            self.tableView.contentInset = newInsets;
+        })
+            
         self.tableView.reloadData()
     }
     
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
+    // this function supports pulling down on the table to initiate a refresh
+    private let pullThreshold = -40.0 as CGFloat
+    override func scrollViewDidScroll(scrollView: UIScrollView) {
+        if scrollView.contentOffset.y < self.pullThreshold && !reloading {
+            // the user has pulled the table view down, which is a gesture to reload
+            let yoffset = self.tableView.contentOffset.y
+            reloadStories()
+        }
     }
     
+    // this function supports drilling down into the detail of a story when the user taps on one
+    override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+        let newsItem = StoryManager.sharedInstance.allNewsItems[indexPath.row]
+        
+        let detailController = self.storyboard?.instantiateViewControllerWithIdentifier("Detail") as! DetailViewController
+        detailController.url = NSURL(string:newsItem.link)!
+        
+        self.navigationController?.pushViewController(detailController, animated: true)
+    }
+    
+    // MARK: - Functions related to asynchronous retrieval of images
+
     func getImageURL(content: String) -> NSURL? {
         
         var returnURL: NSURL?
@@ -72,15 +119,6 @@ class TableViewController: UITableViewController, StoryListener {
             }.resume()
     }
     
-    override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        let newsItem = StoryManager.sharedInstance.allNewsItems[indexPath.row]
-        
-        let detailController = self.storyboard?.instantiateViewControllerWithIdentifier("Detail") as! DetailViewController
-        detailController.url = NSURL(string:newsItem.link)!
-
-        self.navigationController?.pushViewController(detailController, animated: true)
-    }
-
     // MARK: - Table view data source
 
     override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
@@ -112,5 +150,9 @@ class TableViewController: UITableViewController, StoryListener {
         }
         
         return cell
+    }
+
+    override func didReceiveMemoryWarning() {
+        super.didReceiveMemoryWarning()
     }
 }
