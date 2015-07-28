@@ -1,8 +1,8 @@
 //
 //  AppDelegate.swift
-//  NewsFlow
+//  FeedEater
 //
-//  Created by Genius on 7/27/15.
+//  Created by Genius on 7/26/15.
 //  Copyright (c) 2015 Simple Genius Software. All rights reserved.
 //
 
@@ -47,7 +47,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     // MARK: - Core Data stack
 
     lazy var applicationDocumentsDirectory: NSURL = {
-        // The directory the application uses to store the Core Data store file. This code uses a directory named "com.simplegeniusapps.NewsFlow" in the application's documents Application Support directory.
+        // The directory the application uses to store the Core Data store file. This code uses a directory named "com.simplegeniusapps.FeedEater" in the application's documents Application Support directory.
         let urls = NSFileManager.defaultManager().URLsForDirectory(.DocumentDirectory, inDomains: .UserDomainMask)
         return urls[urls.count-1] as! NSURL
     }()
