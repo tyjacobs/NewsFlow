@@ -53,6 +53,8 @@ class StoryManager: NSObject, NSURLConnectionDelegate
             }
         }
         
+        sortAllNewsItems()
+        
         if connectedToNetwork()
         {
             // attempt to retrieve stories from the rss feed, store any new stories in database, then notify listeners
@@ -102,8 +104,7 @@ class StoryManager: NSObject, NSURLConnectionDelegate
             }
         }
         
-        // TO DO: before notifying listeners, sort the news items by date
-        //self.allNewsItems.sort({ $0.dateStamp > $1.dateStamp })
+        sortAllNewsItems()
         
         // notify listeners
         for listener in listeners {
@@ -116,10 +117,18 @@ class StoryManager: NSObject, NSURLConnectionDelegate
     func addNewsItem(newsItemData: NSDictionary) {
         
         // extract the various parts of the news item
-        var title = newsItemData["title"] as! String
-        var link = newsItemData["link"] as! String
-        var snippet = newsItemData["contentSnippet"] as! String
-        var content = newsItemData["content"] as! String
+        let title = newsItemData["title"] as! String
+        let link = newsItemData["link"] as! String
+        let snippet = newsItemData["contentSnippet"] as! String
+        let content = newsItemData["content"] as! String
+        let publishedDateString = newsItemData["publishedDate"] as! String
+        
+        // example of format: Tue, 28 Jul 2015 14:33:35 -0700
+        let dateFormatter = NSDateFormatter()
+        dateFormatter.locale = NSLocale(localeIdentifier: "en_US_POSIX")
+        dateFormatter.dateFormat = "EEE, d MMM yyyy HH:mm:ss z"
+
+        let publishedDate = dateFormatter.dateFromString(publishedDateString)
         
         // if this news item is already in the database, then don't add it
         if (getNewsItemForTitle(title) == nil)
@@ -133,6 +142,7 @@ class StoryManager: NSObject, NSURLConnectionDelegate
                 newsItem.link = link
                 newsItem.snippet = snippet
                 newsItem.imageURL = content
+                newsItem.dateStamp = publishedDate!
                 
                 var error: NSError?
                 if !managedContext.save(&error) {
@@ -144,6 +154,10 @@ class StoryManager: NSObject, NSURLConnectionDelegate
                 }
             }
         }
+    }
+    
+    func sortAllNewsItems() {
+        self.allNewsItems.sort ({ $0.dateStamp.compare($1.dateStamp) == NSComparisonResult.OrderedDescending })
     }
 
     // return the matching news item, or nil if it does not exist

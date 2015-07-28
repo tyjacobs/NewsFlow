@@ -12,6 +12,5 @@ As of July 28 2015 the app is still missing a few of the requirements
 1. Display of DETAIL view when offline (the main table view DOES display)
 2. Tests (supposed to be TDD but I am adding after the fact)
 3. Some bells and whistles I want to add, beyond the requirements:
-   A. Sorting of the stories so the newest ones are on top
-   B. An action to archive a story (delete it from the list)
-   C. More customized detail view
+   A. An action to archive a story (delete it from the list)
+   B. More customized detail view
