@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import SystemConfiguration
 import CoreData
 import UIKit
 
@@ -43,13 +44,20 @@ class StoryManager: NSObject, NSURLConnectionDelegate
             }
         }
         
-        // TO DO: test for network availability and let user know that only cached news items are being shown
-        // for now, we always make the URL request and it just never returns if there is no network
-        
-        // now attempt to retrieve stories from the rss feed, store any new stories in database, then notify listeners
-        var url: NSURL = NSURL(string:StoryManager.feedURLString)!
-        var request: NSURLRequest = NSURLRequest(URL: url)
-        var connection: NSURLConnection = NSURLConnection(request: request, delegate: self, startImmediately: true)!
+        if connectedToNetwork()
+        {
+            // attempt to retrieve stories from the rss feed, store any new stories in database, then notify listeners
+            var url: NSURL = NSURL(string:StoryManager.feedURLString)!
+            var request: NSURLRequest = NSURLRequest(URL: url)
+            var connection: NSURLConnection = NSURLConnection(request: request, delegate: self, startImmediately: true)!
+        }
+        else
+        {
+            // notify listeners right away since the only stories currently available are the ones from the database
+            for listener in listeners {
+                listener.storiesChanged()
+            }
+        }
     }
     
     func connection(didReceiveResponse: NSURLConnection!, didReceiveResponse response: NSURLResponse!) {
@@ -142,5 +150,25 @@ class StoryManager: NSObject, NSURLConnectionDelegate
         }
         
         return returnNewsItem
+    }
+    
+    func connectedToNetwork() -> Bool {
+        
+        var zeroAddress = sockaddr_in()
+        zeroAddress.sin_len = UInt8(sizeofValue(zeroAddress))
+        zeroAddress.sin_family = sa_family_t(AF_INET)
+        
+        let defaultRouteReachability = withUnsafePointer(&zeroAddress) {
+            SCNetworkReachabilityCreateWithAddress(nil, UnsafePointer($0)).takeRetainedValue()
+        }
+        
+        var flags : SCNetworkReachabilityFlags = 0
+        if SCNetworkReachabilityGetFlags(defaultRouteReachability, &flags) == 0 {
+            return false
+        }
+        
+        let isReachable = (flags & UInt32(kSCNetworkFlagsReachable)) != 0
+        let needsConnection = (flags & UInt32(kSCNetworkFlagsConnectionRequired)) != 0
+        return (isReachable && !needsConnection)
     }
 }
