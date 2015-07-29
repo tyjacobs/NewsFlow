@@ -11,10 +11,12 @@ Beyond the basic requirements, I did the following:
 4. Pull-down-to-reload gesture
 5. Local persistence using Core Data
 6. App retains all stories and not just most recent ones
+7. Swipe left then tap Delete to permanently remove a story from the list
 
 
-As of July 28 2015 the app is still missing a few of the requirements
+As of July 29 2015 the app is still missing a few of the requirements
 
 1. Display of DETAIL view when offline (the main table view DOES display)
 2. Tests (supposed to be TDD but I am adding after the fact)
-3. Add an action to archive a story (not in requirements but I want to do it)
+
+After using the app, I realize I would also like to highlight new items after a manual refresh

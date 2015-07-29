@@ -156,6 +156,20 @@ class StoryManager: NSObject, NSURLConnectionDelegate
         }
     }
     
+    // delete the news item at the given index
+    // listeners are not notified, so the caller is responsible for updating its local state surgically or otherwise reloading
+    func archiveNewsItemAtIndex(indexOfItemToArchive: Int) {
+        let newsItemToDelete = allNewsItems[indexOfItemToArchive]
+        allNewsItems.removeAtIndex(indexOfItemToArchive)
+        
+        newsItemToDelete.archived = true
+        
+        var error: NSError?
+        if !managedContext.save(&error) {
+            println("Could not save \(error), \(error?.userInfo)")
+        }
+    }
+    
     func sortAllNewsItems() {
         self.allNewsItems.sort ({ $0.dateStamp.compare($1.dateStamp) == NSComparisonResult.OrderedDescending })
     }

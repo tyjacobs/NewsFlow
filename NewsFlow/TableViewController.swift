@@ -16,6 +16,7 @@ class TableViewController: UITableViewController, StoryListener {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        self.tableView.allowsMultipleSelectionDuringEditing = false;
         
         // add a pretty image to the navigation bar
         var navBar: UINavigationBar = self.navigationController!.navigationBar
@@ -103,7 +104,7 @@ class TableViewController: UITableViewController, StoryListener {
         return returnURL
     }
     
-    func startImageDownload(url: NSURL, imageView: UIImageView){
+    func startImageDownload(url: NSURL, imageView: UIImageView) {
         getDataFromUrl(url) { data in
             dispatch_async(dispatch_get_main_queue()) {
                 if let img = UIImage(data: data!) {
@@ -119,6 +120,10 @@ class TableViewController: UITableViewController, StoryListener {
             }.resume()
     }
     
+    override func didReceiveMemoryWarning() {
+        super.didReceiveMemoryWarning()
+    }
+
     // MARK: - Table view data source
 
     override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
@@ -152,7 +157,13 @@ class TableViewController: UITableViewController, StoryListener {
         return cell
     }
 
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
+    // this is invoked when the user taps "Delete" (after swiping left to reveal the Delete button)
+    override func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
+        if editingStyle == UITableViewCellEditingStyle.Delete {
+            
+            // we never really delete stories, just mark them Archived and remove them from the list
+            StoryManager.sharedInstance.archiveNewsItemAtIndex(indexPath.row)
+            self.tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: UITableViewRowAnimation.Fade)
+        }
     }
 }
