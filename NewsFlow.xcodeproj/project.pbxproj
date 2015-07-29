@@ -21,6 +21,7 @@
 		D8E650FC1B66AF26001805A9 /* FlowCell0.png in Resources */ = {isa = PBXBuildFile; fileRef = D8E650F91B66AF26001805A9 /* FlowCell0.png */; };
 		D8E650FF1B66B282001805A9 /* StoryManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8E650FE1B66B282001805A9 /* StoryManager.swift */; };
 		D8E651031B67C14D001805A9 /* NewsItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8E651021B67C14D001805A9 /* NewsItem.swift */; };
+		D8E651071B69494F001805A9 /* ImagePlaceholder160.png in Resources */ = {isa = PBXBuildFile; fileRef = D8E651061B69494F001805A9 /* ImagePlaceholder160.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -53,6 +54,7 @@
 		D8E650FE1B66B282001805A9 /* StoryManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StoryManager.swift; sourceTree = "<group>"; };
 		D8E651021B67C14D001805A9 /* NewsItem.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NewsItem.swift; sourceTree = "<group>"; };
 		D8E651041B680059001805A9 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = SOURCE_ROOT; };
+		D8E651061B69494F001805A9 /* ImagePlaceholder160.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = ImagePlaceholder160.png; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -142,6 +144,7 @@
 				D8E650F71B66AF26001805A9 /* WaterTop.png */,
 				D8E650F81B66AF26001805A9 /* FlowCell1.png */,
 				D8E650F91B66AF26001805A9 /* FlowCell0.png */,
+				D8E651061B69494F001805A9 /* ImagePlaceholder160.png */,
 			);
 			name = Assets;
 			sourceTree = "<group>";
@@ -232,6 +235,7 @@
 				D8E650FA1B66AF26001805A9 /* WaterTop.png in Resources */,
 				D8E650F61B66AF14001805A9 /* LaunchScreen.xib in Resources */,
 				D8E650F51B66AF14001805A9 /* Main.storyboard in Resources */,
+				D8E651071B69494F001805A9 /* ImagePlaceholder160.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -18,5 +18,6 @@ As of July 29 2015 the app is still missing a few of the requirements
 
 1. Display of DETAIL view when offline (the main table view DOES display)
 2. Tests (supposed to be TDD but I am adding after the fact)
+3. Text displayed in the main table view needs processing to handle encoded characters such as &#39; (apostrophe)
 
-After using the app, I realize I would also like to highlight new items after a manual refresh
+After using the app, I realize I would also like to highlight new ("fresh") items after a manual refresh

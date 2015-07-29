@@ -22,7 +22,7 @@
                                         <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="FlowCell0.png" translatesAutoresizingMaskIntoConstraints="NO" id="FXq-Hs-5W5" userLabel="BackgroundImage">
                                             <rect key="frame" x="80" y="0.0" width="334" height="80"/>
                                         </imageView>
-                                        <imageView userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="WaterTop.png" translatesAutoresizingMaskIntoConstraints="NO" id="bp6-qL-JgI">
+                                        <imageView userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="ImagePlaceholder160.png" translatesAutoresizingMaskIntoConstraints="NO" id="bp6-qL-JgI">
                                             <rect key="frame" x="0.0" y="0.0" width="80" height="80"/>
                                             <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
                                             <constraints>
@@ -77,7 +77,7 @@
                                         <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="FlowCell1.png" translatesAutoresizingMaskIntoConstraints="NO" id="WYD-zH-MDg" userLabel="BackgroundImage">
                                             <rect key="frame" x="80" y="0.0" width="334" height="80"/>
                                         </imageView>
-                                        <imageView userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="WaterTop.png" translatesAutoresizingMaskIntoConstraints="NO" id="32n-14-RUN">
+                                        <imageView userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="ImagePlaceholder160.png" translatesAutoresizingMaskIntoConstraints="NO" id="32n-14-RUN">
                                             <rect key="frame" x="0.0" y="0.0" width="80" height="80"/>
                                             <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
                                             <constraints>
@@ -203,6 +203,6 @@
     <resources>
         <image name="FlowCell0.png" width="1600" height="160"/>
         <image name="FlowCell1.png" width="1600" height="160"/>
-        <image name="WaterTop.png" width="1600" height="285"/>
+        <image name="ImagePlaceholder160.png" width="160" height="160"/>
     </resources>
 </document>

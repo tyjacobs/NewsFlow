@@ -150,6 +150,9 @@ class TableViewController: UITableViewController, StoryListener {
         cell.titleLabel!.text = newsItem.title
         cell.subtitleLabel!.text = newsItem.snippet
         
+        // set a default image in case none is available
+        cell.customImageView!.image = UIImage(named: "ImagePlaceholder160.png")!
+        
         if let checkedUrl = getImageURL(newsItem.imageURL) {
             startImageDownload(checkedUrl, imageView: cell.customImageView!)
         }
