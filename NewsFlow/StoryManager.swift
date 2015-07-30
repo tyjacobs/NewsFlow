@@ -13,15 +13,15 @@ import UIKit
 
 // classes interested in being notified when the story list is updated should
 // implement this protocol and register as a listener on the StoryManager singleton
-protocol StoryListener {
+public protocol StoryListener {
     func storiesChanged()
 }
 
 // this singleton class manages the list of cached and dynamically retrieved news items
 // use StoryManager.sharedInstance, call addListener(), and then retrieveAllNewsItems()
-class StoryManager: NSObject, NSURLConnectionDelegate
+public class StoryManager: NSObject, NSURLConnectionDelegate
 {
-    static let sharedInstance = StoryManager()
+    public static let sharedInstance = StoryManager()
     private override init() {}
     
     static let feedURLString = "http://ajax.googleapis.com/ajax/services/feed/load?v=1.0&num=8&q=http://news.google.com/?output=rss"
@@ -32,12 +32,12 @@ class StoryManager: NSObject, NSURLConnectionDelegate
     var allNewsItems: [NewsItem] = []
 
     
-    func addListener(listener: StoryListener) {
+    public func addListener(listener: StoryListener) {
         listeners.append(listener)
     }
 
     private var reloading = false
-    func retrieveAllNewsItems()
+    public func retrieveAllNewsItems()
     {
         // we must prevent the retrieval from running multiple times in parallel, lest jsondata get corrupted
         if reloading { return }
@@ -195,7 +195,7 @@ class StoryManager: NSObject, NSURLConnectionDelegate
     }
     
     // this is a utility function to check whether the device currently has network access
-    func connectedToNetwork() -> Bool {
+    public func connectedToNetwork() -> Bool {
         
         var zeroAddress = sockaddr_in()
         zeroAddress.sin_len = UInt8(sizeofValue(zeroAddress))

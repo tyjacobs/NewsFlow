@@ -8,13 +8,13 @@
 
 import UIKit
 
-class TableViewController: UITableViewController, StoryListener {
+public class TableViewController: UITableViewController, StoryListener {
 
     var items = NSMutableArray()
     var jsondata: NSMutableData = NSMutableData()
     let activityView = UIActivityIndicatorView(frame: CGRectMake(0, 0, 40, 40))
     
-    override func viewDidLoad() {
+    public override func viewDidLoad() {
         super.viewDidLoad()
         self.tableView.allowsMultipleSelectionDuringEditing = false;
         
@@ -34,8 +34,9 @@ class TableViewController: UITableViewController, StoryListener {
         reloadStories()
     }
     
-    private var reloading = false
-    func reloadStories() {
+    public var reloading = false
+    public func reloadStories() {
+        if (reloading) { return }
         reloading = true
 
         // retrieve all news items - this will invoke storiesChanged() when complete
@@ -49,7 +50,7 @@ class TableViewController: UITableViewController, StoryListener {
         activityView.startAnimating()
     }
         
-    func storiesChanged() {
+    public func storiesChanged() {
 
         // this is called when the stories are done loading
         // stop and hide the activity indicator above the table and reload the table
@@ -67,7 +68,7 @@ class TableViewController: UITableViewController, StoryListener {
     
     // this function supports pulling down on the table to initiate a refresh
     private let pullThreshold = -40.0 as CGFloat
-    override func scrollViewDidScroll(scrollView: UIScrollView) {
+    override public func scrollViewDidScroll(scrollView: UIScrollView) {
         if scrollView.contentOffset.y < self.pullThreshold && !reloading {
             // the user has pulled the table view down, which is a gesture to reload
             let yoffset = self.tableView.contentOffset.y
@@ -76,7 +77,7 @@ class TableViewController: UITableViewController, StoryListener {
     }
     
     // this function supports drilling down into the detail of a story when the user taps on one
-    override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+    override public func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         let newsItem = StoryManager.sharedInstance.allNewsItems[indexPath.row]
         
         let detailController = self.storyboard?.instantiateViewControllerWithIdentifier("Detail") as! DetailViewController
@@ -87,7 +88,7 @@ class TableViewController: UITableViewController, StoryListener {
     
     // MARK: - Functions related to asynchronous retrieval of images
 
-    func getImageURL(content: String) -> NSURL? {
+    public func getImageURL(content: String) -> NSURL? {
         
         var returnURL: NSURL?
         var range: Range<String.Index>? = content.rangeOfString("img src=\"")
@@ -104,7 +105,7 @@ class TableViewController: UITableViewController, StoryListener {
         return returnURL
     }
     
-    func startImageDownload(url: NSURL, imageView: UIImageView) {
+    public func startImageDownload(url: NSURL, imageView: UIImageView) {
         getDataFromUrl(url) { data in
             dispatch_async(dispatch_get_main_queue()) {
                 if let img = UIImage(data: data!) {
@@ -120,21 +121,21 @@ class TableViewController: UITableViewController, StoryListener {
             }.resume()
     }
     
-    override func didReceiveMemoryWarning() {
+    override public func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
     }
 
     // MARK: - Table view data source
 
-    override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
+    override public func numberOfSectionsInTableView(tableView: UITableView) -> Int {
         return 1
     }
 
-    override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    override public func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return StoryManager.sharedInstance.allNewsItems.count
     }
 
-    override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
+    override public func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         
         let cell: TableViewCell
         
@@ -161,7 +162,7 @@ class TableViewController: UITableViewController, StoryListener {
     }
 
     // this is invoked when the user taps "Delete" (after swiping left to reveal the Delete button)
-    override func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
+    override public func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
         if editingStyle == UITableViewCellEditingStyle.Delete {
             
             // we never really delete stories, just mark them Archived and remove them from the list

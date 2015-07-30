@@ -1,5 +1,5 @@
 # NewsFlow
-Basic RSS Reader written by Ty Jacobs in Swift using XCode 6.4 (meaning, Swift 1.2 as opposed to Swift 2)
+Basic RSS Reader written by Ty Jacobs in Swift 1.2 using XCode 6.4
 
 This app was developed to meet the requirements for a "Code Test" by A&F in July 2015.
 I also used it to develop my skills in Swift after taking a class at CocoaConf 2015.
@@ -15,9 +15,6 @@ Beyond the basic requirements, I did the following:
 
 
 As of July 29 2015 the app is still missing a few of the requirements
-
-1. Display of DETAIL view when offline (the main table view DOES display)
-2. Tests (supposed to be TDD but I am adding after the fact)
-3. Text displayed in the main table view needs processing to handle encoded characters such as &#39; (apostrophe)
-
-After using the app, I realize I would also like to highlight new ("fresh") items after a manual refresh
+1. Display of DETAIL view when offline
+2. Text displayed in the main table view needs processing to handle encoded characters such as &#39; (apostrophe)
+3. After using the app, I also realize a nice feature would be to highlight new ("fresh") items after a manual refresh
