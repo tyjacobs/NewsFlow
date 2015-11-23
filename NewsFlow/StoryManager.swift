@@ -10,36 +10,58 @@ import Foundation
 import SystemConfiguration
 import CoreData
 import UIKit
+import ReachabilitySwift
+import Alamofire
 
 // classes interested in being notified when the story list is updated should
-// implement this protocol and register as a listener on the StoryManager singleton
+// implement this protocol and register as a listener on StoryManager.sharedInstance
 public protocol StoryListener {
     func storiesChanged()
+    func networkConnected()
 }
 
 // this singleton class manages the list of cached and dynamically retrieved news items
 // use StoryManager.sharedInstance, call addListener(), and then retrieveAllNewsItems()
-public class StoryManager: NSObject, NSURLConnectionDelegate
-{
+public class StoryManager: NSObject, NSURLConnectionDelegate {
+
     public static let sharedInstance = StoryManager()
-    private override init() {}
-    
+
     static let feedURLString = "http://ajax.googleapis.com/ajax/services/feed/load?v=1.0&num=8&q=http://news.google.com/?output=rss"
     
-    private let managedContext = (UIApplication.sharedApplication().delegate as! AppDelegate).managedObjectContext!
+    private var reachability: Reachability?
+    public var connectedToNetwork = false
+    
+    private let managedContext = CoreDataManager.sharedManager.managedObjectContext!
     private var listeners: [StoryListener] = []
-    private var jsondata: NSMutableData = NSMutableData()
+    private var reloading = false
     var allNewsItems: [NewsItem] = []
+    
+    private override init() {
+        
+        super.init()
 
+        reachability = try? startReachability()
+        if reachability == nil {
+            // there was some problem setting up reachability (startReachability() threw an exception)
+            // but in this case connectedToNetwork will still have the default value of false, so
+            // from the user's perspective, it just means that the network is not available.  Generally
+            // this should "never" happen and there is no good way to explain it to the user anyway,
+            // so, do nothing.
+        }
+    }
+    
+    deinit {
+        stopReachability()
+    }
     
     public func addListener(listener: StoryListener) {
+
         listeners.append(listener)
     }
 
-    private var reloading = false
-    public func retrieveAllNewsItems()
-    {
-        // we must prevent the retrieval from running multiple times in parallel, lest jsondata get corrupted
+    public func retrieveAllNewsItems() {
+
+        // prevent the retrieval from running multiple times in parallel
         if reloading { return }
         reloading = true
 
@@ -47,72 +69,60 @@ public class StoryManager: NSObject, NSURLConnectionDelegate
         allNewsItems = []
         let fetchRequest = NSFetchRequest(entityName: "NewsItem")
         fetchRequest.predicate = NSPredicate(format: "archived != YES")
-        if let fetchResults = managedContext.executeFetchRequest(fetchRequest, error: nil) as? [NewsItem] {
+        if let fetchResults = (try? managedContext.executeFetchRequest(fetchRequest)) as? [NewsItem] {
             for newsItem in fetchResults {
                 allNewsItems.append(newsItem)
             }
         }
         
-        sortAllNewsItems()
-        
-        if connectedToNetwork()
-        {
-            // attempt to retrieve stories from the rss feed, store any new stories in database, then notify listeners
-            jsondata = NSMutableData()
-            var url: NSURL = NSURL(string:StoryManager.feedURLString)!
-            var request: NSURLRequest = NSURLRequest(URL: url)
-            var connection: NSURLConnection = NSURLConnection(request: request, delegate: self, startImmediately: true)!
-        }
-        else
-        {
-            // notify listeners right away since the only stories currently available are the ones from the database
-            for listener in listeners {
-                listener.storiesChanged()
+        // now attempt to retrieve stories from the rss feed, store any new stories in database, then notify listeners
+        if connectedToNetwork {
+            
+            Alamofire.request(.GET, StoryManager.feedURLString).responseJSON { response in
+            
+                //print(response.request)  // original URL request
+                //print(response.response) // URL response
+                //print(response.data)     // server data
+                //print(response.result)   // result of response serialization
+                
+                if let jsonResult = response.result.value {
+                    //print("JSON: \(jsonResult)")
+                    
+                    if let responseData = jsonResult["responseData"] as? NSDictionary {
+                        if let feed = responseData["feed"] as? NSDictionary {
+                            if let entries = feed["entries"] as? NSArray {
+                                // for each news item retrieved from the rss feed, add it to the database and to allNewsItems
+                                // the news items will only actually be added if they are not already in the database, to avoid duplicates
+                                for entry in entries {
+                                    self.addNewsItem(entry as! NSDictionary)
+                                }
+                            }
+                        }
+                    }
+                }
+                
+                self.sortAndNotifyListeners()
+                self.reloading = false
             }
+        }
+        else {
+            
+            // notify listeners right away since the only stories currently available are the ones from the database
+            sortAndNotifyListeners()
             reloading = false
         }
     }
     
-    func connection(didReceiveResponse: NSURLConnection!, didReceiveResponse response: NSURLResponse!) {
-        // received a new request, so clear out the json data
-        self.jsondata = NSMutableData()
-    }
-    
-    func connection(connection: NSURLConnection!, didReceiveData data: NSData!) {
-        // append this chunk of data to the jason data object
-        self.jsondata.appendData(data)
-    }
-    
-    func connectionDidFinishLoading(connection: NSURLConnection!) {
-        // the request is now complete and self.data now holds the full jason data results
-        // parse out the entries and save into self.items, then reload the table view
+    func sortAndNotifyListeners() {
         
-        var err: NSError?
-        var jsonResult: NSDictionary = NSJSONSerialization.JSONObjectWithData(jsondata, options: NSJSONReadingOptions.MutableContainers, error: &err) as! NSDictionary
-        
-        if (err == nil) {
-            if let responseData = jsonResult["responseData"] as? NSDictionary {
-                if let feed = responseData["feed"] as? NSDictionary {
-                    if let entries = feed["entries"] as? NSArray {
-                        // for each news item retrieved from the rss feed, add it to the database and to allNewsItems
-                        // the news items will only actually be added if they are not already in the database, to avoid duplicates
-                        for entry in entries {
-                            addNewsItem(entry as! NSDictionary)
-                        }
-                    }
-                }
-            }
-        }
-        
-        sortAllNewsItems()
+        self.sortAllNewsItems()
         
         // notify listeners
-        for listener in listeners {
+        for listener in self.listeners {
             listener.storiesChanged()
         }
-        reloading = false
     }
-
+    
     // add a new news item to the database (and cached list), if it does not already exist
     func addNewsItem(newsItemData: NSDictionary) {
         
@@ -131,11 +141,10 @@ public class StoryManager: NSObject, NSURLConnectionDelegate
         let publishedDate = dateFormatter.dateFromString(publishedDateString)
         
         // if this news item is already in the database, then don't add it
-        if (getNewsItemForTitle(title) == nil)
-        {
+        if getNewsItemForTitle(title) == nil {
             // the news item was not found, so create a new one and add it to the database
-            if let entity = NSEntityDescription.entityForName("NewsItem", inManagedObjectContext: self.managedContext)
-            {
+            if let entity = NSEntityDescription.entityForName("NewsItem", inManagedObjectContext: self.managedContext) {
+                
                 let newsItem = NSManagedObject(entity: entity, insertIntoManagedObjectContext:managedContext) as! NewsItem
                 
                 newsItem.title = title
@@ -145,12 +154,13 @@ public class StoryManager: NSObject, NSURLConnectionDelegate
                 newsItem.dateStamp = publishedDate!
                 
                 var error: NSError?
-                if !managedContext.save(&error) {
-                    println("Could not save \(error), \(error?.userInfo)")
-                }
-                else {
+                do {
+                    try managedContext.save()
                     // the new item was successfully saved to the database, so add it to the in-memory list
                     allNewsItems.append(newsItem)
+                } catch let error1 as NSError {
+                    error = error1
+                    print("Could not save \(error), \(error?.userInfo)")
                 }
             }
         }
@@ -165,13 +175,16 @@ public class StoryManager: NSObject, NSURLConnectionDelegate
         newsItemToDelete.archived = true
         
         var error: NSError?
-        if !managedContext.save(&error) {
-            println("Could not save \(error), \(error?.userInfo)")
+        do {
+            try managedContext.save()
+        } catch let error1 as NSError {
+            error = error1
+            print("Could not save \(error), \(error?.userInfo)")
         }
     }
     
     func sortAllNewsItems() {
-        self.allNewsItems.sort ({ $0.dateStamp.compare($1.dateStamp) == NSComparisonResult.OrderedDescending })
+        self.allNewsItems.sortInPlace({ $0.dateStamp.compare($1.dateStamp) == NSComparisonResult.OrderedDescending })
     }
 
     // return the matching news item, or nil if it does not exist
@@ -180,12 +193,12 @@ public class StoryManager: NSObject, NSURLConnectionDelegate
         // for now, a news item is uniquely identified by its title
         var returnNewsItem: NewsItem?
 
-        if let managedContext = (UIApplication.sharedApplication().delegate as! AppDelegate).managedObjectContext
-        {
+        if let managedContext = CoreDataManager.sharedManager.managedObjectContext {
+            
             let fetchRequest = NSFetchRequest(entityName: "NewsItem")
             fetchRequest.predicate = NSPredicate(format: "title = %@", title)
-            if let fetchResults = managedContext.executeFetchRequest(fetchRequest, error: nil) as? [NewsItem] {
-                if (fetchResults.count > 0) {
+            if let fetchResults = (try? managedContext.executeFetchRequest(fetchRequest)) as? [NewsItem] {
+                if fetchResults.count > 0 {
                     returnNewsItem = fetchResults[0]
                 }
             }
@@ -193,25 +206,36 @@ public class StoryManager: NSObject, NSURLConnectionDelegate
         
         return returnNewsItem
     }
+}
+
+// Reachability stuff
+extension StoryManager {
     
-    // this is a utility function to check whether the device currently has network access
-    public func connectedToNetwork() -> Bool {
+    func startReachability() throws -> Reachability {
         
-        var zeroAddress = sockaddr_in()
-        zeroAddress.sin_len = UInt8(sizeofValue(zeroAddress))
-        zeroAddress.sin_family = sa_family_t(AF_INET)
+        let reachability = try Reachability.reachabilityForInternetConnection()
         
-        let defaultRouteReachability = withUnsafePointer(&zeroAddress) {
-            SCNetworkReachabilityCreateWithAddress(nil, UnsafePointer($0)).takeRetainedValue()
+        reachability.whenReachable = { reachability in
+            dispatch_async(dispatch_get_main_queue()) {
+                self.connectedToNetwork = true
+                
+                for listener in self.listeners {
+                    listener.networkConnected()
+                }
+            }
+        }
+        reachability.whenUnreachable = { reachability in
+            dispatch_async(dispatch_get_main_queue()) {
+                self.connectedToNetwork = false
+            }
         }
         
-        var flags : SCNetworkReachabilityFlags = 0
-        if SCNetworkReachabilityGetFlags(defaultRouteReachability, &flags) == 0 {
-            return false
-        }
+        try reachability.startNotifier()
         
-        let isReachable = (flags & UInt32(kSCNetworkFlagsReachable)) != 0
-        let needsConnection = (flags & UInt32(kSCNetworkFlagsConnectionRequired)) != 0
-        return (isReachable && !needsConnection)
+        return reachability
+    }
+    
+    func stopReachability() {
+        reachability?.stopNotifier()
     }
 }

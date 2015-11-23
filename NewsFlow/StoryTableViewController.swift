@@ -1,5 +1,5 @@
 //
-//  TableViewController.swift
+//  StoryTableViewController.swift
 //  FeedEater
 //
 //  Created by Genius on 7/26/15.
@@ -7,25 +7,28 @@
 //
 
 import UIKit
+import Alamofire
 
-public class TableViewController: UITableViewController, StoryListener {
+public class StoryTableViewController: UITableViewController {
 
     var items = NSMutableArray()
-    var jsondata: NSMutableData = NSMutableData()
     let activityView = UIActivityIndicatorView(frame: CGRectMake(0, 0, 40, 40))
-    
+
+    public var reloading = false
+
     public override func viewDidLoad() {
+        
         super.viewDidLoad()
         self.tableView.allowsMultipleSelectionDuringEditing = false;
         
         // add a pretty image to the navigation bar
-        var navBar: UINavigationBar = self.navigationController!.navigationBar
-        navBar.setBackgroundImage(UIImage(named: "WaterTop.png")!.resizableImageWithCapInsets(UIEdgeInsetsMake(0, 0, 0, 0), resizingMode: .Stretch), forBarMetrics: .Default)
+        let navBar: UINavigationBar = self.navigationController!.navigationBar
+        navBar.setBackgroundImage(UIImage(named: "WaterTop.png")?.resizableImageWithCapInsets(UIEdgeInsetsMake(0, 0, 0, 0), resizingMode: .Stretch), forBarMetrics: .Default)
         
         // install the activity view as the table header, but hide it initially
         self.tableView.tableHeaderView = activityView
         let insets = self.tableView.contentInset;
-        let newInsets: UIEdgeInsets = UIEdgeInsetsMake(insets.top - CGFloat(40), insets.left, insets.bottom, insets.right)
+        let newInsets: UIEdgeInsets = UIEdgeInsetsMake(insets.top-40, insets.left, insets.bottom, insets.right)
         self.tableView.contentInset = newInsets;
 
         // register to get notified when the story list is populated or changes
@@ -34,9 +37,11 @@ public class TableViewController: UITableViewController, StoryListener {
         reloadStories()
     }
     
-    public var reloading = false
     public func reloadStories() {
-        if (reloading) { return }
+        
+        if reloading {
+            return
+        }
         reloading = true
 
         // retrieve all news items - this will invoke storiesChanged() when complete
@@ -44,40 +49,25 @@ public class TableViewController: UITableViewController, StoryListener {
         
         // expose the activity indicator just above the table
         let insets = self.tableView.contentInset;
-        let newInsets: UIEdgeInsets = UIEdgeInsetsMake(insets.top + CGFloat(40), insets.left, insets.bottom, insets.right)
+        let newInsets: UIEdgeInsets = UIEdgeInsetsMake(insets.top+40, insets.left, insets.bottom, insets.right)
         self.tableView.contentInset = newInsets;
         
         activityView.startAnimating()
     }
         
-    public func storiesChanged() {
-
-        // this is called when the stories are done loading
-        // stop and hide the activity indicator above the table and reload the table
-        reloading = false
-        activityView.stopAnimating()
-        
-        UIView.animateWithDuration(0.4, animations: {
-            let insets = self.tableView.contentInset;
-            let newInsets: UIEdgeInsets = UIEdgeInsetsMake(insets.top - CGFloat(40), insets.left, insets.bottom, insets.right)
-            self.tableView.contentInset = newInsets;
-        })
-            
-        self.tableView.reloadData()
-    }
-    
     // this function supports pulling down on the table to initiate a refresh
     private let pullThreshold = -40.0 as CGFloat
     override public func scrollViewDidScroll(scrollView: UIScrollView) {
+        
         if scrollView.contentOffset.y < self.pullThreshold && !reloading {
             // the user has pulled the table view down, which is a gesture to reload
-            let yoffset = self.tableView.contentOffset.y
             reloadStories()
         }
     }
     
     // this function supports drilling down into the detail of a story when the user taps on one
     override public func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+        
         let newsItem = StoryManager.sharedInstance.allNewsItems[indexPath.row]
         
         let detailController = self.storyboard?.instantiateViewControllerWithIdentifier("Detail") as! DetailViewController
@@ -93,10 +83,10 @@ public class TableViewController: UITableViewController, StoryListener {
         var returnURL: NSURL?
         var range: Range<String.Index>? = content.rangeOfString("img src=\"")
         
-        if (range != nil) {
+        if range != nil {
             var imagePath = content.substringFromIndex(range!.endIndex) as String
             range = imagePath.rangeOfString("\"")
-            if (range != nil) {
+            if range != nil {
                 imagePath = "http:" + imagePath.substringToIndex(range!.startIndex)
                 returnURL = NSURL(string:imagePath)
             }
@@ -106,21 +96,17 @@ public class TableViewController: UITableViewController, StoryListener {
     }
     
     public func startImageDownload(url: NSURL, imageView: UIImageView) {
-        getDataFromUrl(url) { data in
+        
+        Alamofire.request(.GET, url.absoluteString).responseData { response in
+            
             dispatch_async(dispatch_get_main_queue()) {
-                if let img = UIImage(data: data!) {
-                    imageView.image = img;
+                if let image = UIImage(data: response.data!) {
+                    imageView.image = image;
                 }
             }
         }
     }
 
-    func getDataFromUrl(url: NSURL, completion: ((data: NSData?) -> Void)) {
-        NSURLSession.sharedSession().dataTaskWithURL(url) { (data, response, error) in
-            completion(data: data)
-            }.resume()
-    }
-    
     override public func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
     }
@@ -137,25 +123,25 @@ public class TableViewController: UITableViewController, StoryListener {
 
     override public func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         
-        let cell: TableViewCell
+        let cell: StoryTableViewCell
         
         // two reusable cell templates are used to get the alternating row colors
-        if (indexPath.row % 2 == 0) {
-            cell = tableView.dequeueReusableCellWithIdentifier("rssItemCell0", forIndexPath: indexPath) as! TableViewCell
+        if indexPath.row % 2 == 0 {
+            cell = tableView.dequeueReusableCellWithIdentifier("rssItemCell0", forIndexPath: indexPath) as! StoryTableViewCell
         }
         else {
-            cell = tableView.dequeueReusableCellWithIdentifier("rssItemCell1", forIndexPath: indexPath) as! TableViewCell
+            cell = tableView.dequeueReusableCellWithIdentifier("rssItemCell1", forIndexPath: indexPath) as! StoryTableViewCell
         }
 
         let newsItem = StoryManager.sharedInstance.allNewsItems[indexPath.row]
         cell.titleLabel!.text = newsItem.title
         cell.subtitleLabel!.text = newsItem.snippet
         
-        // set a default image in case none is available
+        // set a default initial image in case none is available or the download fails
         cell.customImageView!.image = UIImage(named: "ImagePlaceholder160.png")!
         
-        if let checkedUrl = getImageURL(newsItem.imageURL) {
-            startImageDownload(checkedUrl, imageView: cell.customImageView!)
+        if let imageURL = getImageURL(newsItem.imageURL) {
+            startImageDownload(imageURL, imageView: cell.customImageView!)
         }
         
         return cell
@@ -169,5 +155,28 @@ public class TableViewController: UITableViewController, StoryListener {
             StoryManager.sharedInstance.archiveNewsItemAtIndex(indexPath.row)
             self.tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: UITableViewRowAnimation.Fade)
         }
+    }
+}
+
+extension StoryTableViewController: StoryListener {
+    
+    public func storiesChanged() {
+        
+        // this is called when the stories are done loading
+        // stop and hide the activity indicator above the table and reload the table
+        reloading = false
+        activityView.stopAnimating()
+        
+        UIView.animateWithDuration(0.4, animations: {
+            let insets = self.tableView.contentInset;
+            let newInsets: UIEdgeInsets = UIEdgeInsetsMake(insets.top-CGFloat(40), insets.left, insets.bottom, insets.right)
+            self.tableView.contentInset = newInsets;
+        })
+        
+        self.tableView.reloadData()
+    }
+    
+    public func networkConnected() {
+        self.reloadStories()
     }
 }

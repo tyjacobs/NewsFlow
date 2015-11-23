@@ -1,8 +1,10 @@
 # NewsFlow
-Basic RSS Reader written by Ty Jacobs in Swift 1.2 using XCode 6.4
+Basic RSS Reader written by Ty Jacobs in Swift 2 using XCode 7.1.1
 
-This app was developed to meet the requirements for a "Code Test" by A&F in July 2015.
-I also used it to develop my skills in Swift after taking a class at CocoaConf 2015.
+This app was developed to meet the requirements for a "Code Exercise: RSS Feed Reader" by A&F in Nov 2015.
+
+The app uses CocoaPods, specifically ReachabilitySwift and Alamofire
+
 
 Beyond the basic requirements, I did the following:
 1. The app works on all sizes/shapes of iOS devices
@@ -14,7 +16,7 @@ Beyond the basic requirements, I did the following:
 7. Swipe left then tap Delete to permanently remove a story from the list
 
 
-As of July 29 2015 the app is still missing a few of the requirements
+As of Nov 22 2015 the app is still missing a few of the requirements
 1. Display of DETAIL view when offline
 2. Text displayed in the main table view needs processing to handle encoded characters such as &#39; (apostrophe)
 3. After using the app, I also realize a nice feature would be to highlight new ("fresh") items after a manual refresh

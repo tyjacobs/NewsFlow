@@ -12,14 +12,14 @@ import NewsFlow
 
 class NewsFlowTests: XCTestCase, StoryListener {
     
-    private var tableViewController: TableViewController?
+    private var tableViewController: StoryTableViewController?
     override func setUp() {
         super.setUp()
         let appDelegate = UIApplication.sharedApplication().delegate
         if let vc = appDelegate?.window??.rootViewController {
             if let nvc = vc as? UINavigationController {
-                tableViewController = nvc.viewControllers[0] as? TableViewController
-                if (tableViewController == nil) {
+                tableViewController = nvc.viewControllers[0] as? StoryTableViewController
+                if tableViewController == nil {
                     XCTFail("top view controller is not the main table controller")
                 }
             }
@@ -38,7 +38,7 @@ class NewsFlowTests: XCTestCase, StoryListener {
     }
     
     func testNetworkConnectivity() {
-        let connected = StoryManager.sharedInstance.connectedToNetwork()
+        let connected = StoryManager.sharedInstance.connectedToNetwork
         XCTAssert(connected, "not connected to network as expected")
     }
     
@@ -65,14 +65,17 @@ class NewsFlowTests: XCTestCase, StoryListener {
         storyManagerRetrievalExpectation?.fulfill()
     }
     
+    func networkConnected() {
+        // TODO
+    }
+    
     var tableReloadExpectation: XCTestExpectation?
     var tableReloadTimer: NSTimer?
     func testTableReload() {
         tableReloadExpectation = self.expectationWithDescription("table update completed")
 
         tableViewController?.reloadStories()
-        let reloading = tableViewController?.reloading
-        
+
         tableReloadTimer = NSTimer.scheduledTimerWithTimeInterval(0.2, target: self, selector: Selector("checkForReloadComplete"), userInfo: nil, repeats: true)
         
         self.waitForExpectationsWithTimeout(1.0, handler: nil)
@@ -91,7 +94,7 @@ class NewsFlowTests: XCTestCase, StoryListener {
     private let correctURL = "http://www.simplegeniussoftware.com/_Media/sgprojectpromacicon256.png"
     func testImageURLCreation() {
         let imageURL = tableViewController?.getImageURL(sampleContent)
-        XCTAssertEqual(imageURL!.absoluteString!, correctURL, "getImageURL failed to parse and generate a valid URL")
+        XCTAssertEqual(imageURL!.absoluteString, correctURL, "getImageURL failed to parse and generate a valid URL")
     }
     
     var imageDownloadExpectation: XCTestExpectation?
@@ -110,7 +113,7 @@ class NewsFlowTests: XCTestCase, StoryListener {
     
     // this is part of testImageDownload()
     func checkForImageDownload() {
-        if (uiiv!.image != nil) {
+        if uiiv!.image != nil {
             imageDownloadTimer?.invalidate()
             imageDownloadExpectation?.fulfill()
         }
@@ -120,9 +123,8 @@ class NewsFlowTests: XCTestCase, StoryListener {
         storyManagerRetrievalExpectation = self.expectationWithDescription("got callback from StoryManager")
         StoryManager.sharedInstance.addListener(self)
 
-        if let insets = tableViewController?.tableView.contentInset {
-            let newInsets = UIEdgeInsetsMake(insets.top + CGFloat(100), insets.left, insets.bottom, insets.right)
-            tableViewController?.tableView.scrollRectToVisible(CGRectMake(0, -100, 40, 40), animated: true)
+        if let tableViewController = tableViewController {
+            tableViewController.tableView.scrollRectToVisible(CGRectMake(0, -100, 40, 40), animated: true)
         }
         
         self.waitForExpectationsWithTimeout(2.0, handler: nil)

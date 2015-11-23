@@ -1,5 +1,5 @@
 //
-//  TableViewCell.swift
+//  StoryTableViewCell.swift
 //  FeedEater
 //
 //  Created by Genius on 7/26/15.
@@ -8,8 +8,8 @@
 
 import UIKit
 
-// this custom table view cell is used for the entries in the main table
-class TableViewCell: UITableViewCell {
+// this custom table view cell is used for the entries in the main story table
+class StoryTableViewCell: UITableViewCell {
     
     @IBOutlet weak var titleLabel: UILabel?
     @IBOutlet weak var subtitleLabel: UILabel?
@@ -20,7 +20,7 @@ class TableViewCell: UITableViewCell {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
     }
 
-    required init(coder aDecoder: NSCoder) {
+    required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
     }
 

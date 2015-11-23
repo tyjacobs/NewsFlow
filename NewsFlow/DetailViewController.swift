@@ -14,22 +14,15 @@ class DetailViewController: UIViewController {
     @IBOutlet weak var webView: UIWebView?
     var url: NSURL?
 
-    override func viewDidLoad() {
-        super.viewDidLoad()
-
-        if url != nil && webView != nil {
-            var request: NSURLRequest = NSURLRequest(URL: url!)
-            webView!.loadRequest(request)
-        }
-    }
-    
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
-        
-        if url != nil && webView != nil {
-            var request: NSURLRequest = NSURLRequest(URL: url!)
-            webView!.loadRequest(request)
+        reload()
+    }
+    
+    func reload() {
+        if let url = url, let webView = webView {
+            let request: NSURLRequest = NSURLRequest(URL: url)
+            webView.loadRequest(request)
         }
-
     }
 }
