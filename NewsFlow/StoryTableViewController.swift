@@ -42,9 +42,7 @@ public class StoryTableViewController: UITableViewController {
     
     public func reloadStories() {
         
-        if reloading {
-            return
-        }
+        guard !reloading else { return }
         reloading = true
 
         // retrieve all news items - this will invoke storiesChanged() when complete
@@ -64,6 +62,7 @@ public class StoryTableViewController: UITableViewController {
         if scrollView.contentOffset.y < self.pullThreshold && !reloading {
             // the user has pulled the table view down, which is a gesture to reload
             reloadStories()
+            tableView.scrollEnabled = false
         }
     }
     
@@ -167,7 +166,8 @@ extension StoryTableViewController: StoryListener {
         // stop and hide the activity indicator above the table and reload the table
         reloading = false
         activityView.stopAnimating()
-        
+        self.tableView.scrollEnabled = true
+
         UIView.animateWithDuration(0.4, animations: {
             let insets = self.tableView.contentInset;
             let newInsets: UIEdgeInsets = UIEdgeInsetsMake(insets.top-StoryTableViewController.activityViewSize, insets.left, insets.bottom, insets.right)

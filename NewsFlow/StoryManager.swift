@@ -115,6 +115,11 @@ public class StoryManager: NSObject, NSURLConnectionDelegate {
     
     func sortAndNotifyListeners() {
         
+        // Sometimes we get here too quickly: either we are offline or the Alamofire request returns quickly.
+        // In such cases it is a better UI experience if we delay just a bit so the activity indicator isn't so flickery.
+        // Ideally we would check to see if it has already been more than 0.5 seconds but for now I just tack on that amount.
+        NSThread.sleepForTimeInterval(0.5)
+        
         self.sortAllNewsItems()
         
         // notify listeners

@@ -119,7 +119,7 @@ class NewsFlowTests: XCTestCase, StoryListener {
         }
     }
     
-    func testforceRefreshByPullDown() {
+    func testForceRefreshByPullDown() {
         storyManagerRetrievalExpectation = self.expectationWithDescription("got callback from StoryManager")
         StoryManager.sharedInstance.addListener(self)
 
@@ -127,7 +127,7 @@ class NewsFlowTests: XCTestCase, StoryListener {
             tableViewController.tableView.scrollRectToVisible(CGRectMake(0, -100, 40, 40), animated: true)
         }
         
-        self.waitForExpectationsWithTimeout(2.0, handler: nil)
+        self.waitForExpectationsWithTimeout(4.0, handler: nil)
         storyManagerRetrievalExpectation = nil
     }
     
