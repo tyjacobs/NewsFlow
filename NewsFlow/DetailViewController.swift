@@ -7,16 +7,21 @@
 //
 
 import UIKit
+import PKHUD
+import WebKit
 
 // this view controller is used when the user drills down into the detail for a story
 class DetailViewController: UIViewController {
 
-    @IBOutlet weak var webView: UIWebView?
+    @IBOutlet weak var webView: WKWebView?
     var url: NSURL?
 
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
         reload()
+        
+        PKHUD.sharedHUD.contentView = PKHUDProgressView()
+        PKHUD.sharedHUD.show()
     }
     
     func reload() {

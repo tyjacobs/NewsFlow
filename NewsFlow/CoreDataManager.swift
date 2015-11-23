@@ -11,6 +11,8 @@ import CoreData
 
 class CoreDataManager {
     
+    // Note: so far I just kept the default error handling and messages from the template, which would need to be improved.
+    
     // construct a singleton instance and hide the init() method as private to prevent more from being created
     static let sharedManager = CoreDataManager()
     private init() {}
@@ -19,7 +21,7 @@ class CoreDataManager {
         let urls = NSFileManager.defaultManager().URLsForDirectory(.DocumentDirectory, inDomains: .UserDomainMask)
         return urls[urls.count-1]
     }()
-    
+
     lazy var managedObjectModel: NSManagedObjectModel = {
         let modelURL = NSBundle.mainBundle().URLForResource("NewsFlow", withExtension: "momd")!
         return NSManagedObjectModel(contentsOfURL: modelURL)!

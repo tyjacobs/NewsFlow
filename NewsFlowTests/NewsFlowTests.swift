@@ -133,6 +133,7 @@ class NewsFlowTests: XCTestCase, StoryListener {
     
     /*
         Additional Test Ideas, not yet implemented
+        - networkConnected()
         - navigate to detail view (tableView.didSelectRowAtIndexPath indexPath)
         - navigate back from detail
         - Work offline

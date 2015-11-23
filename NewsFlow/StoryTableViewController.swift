@@ -11,8 +11,10 @@ import Alamofire
 
 public class StoryTableViewController: UITableViewController {
 
+    static let activityViewSize:CGFloat = 40
     var items = NSMutableArray()
-    let activityView = UIActivityIndicatorView(frame: CGRectMake(0, 0, 40, 40))
+    let activityView = UIActivityIndicatorView(frame: CGRectMake(0, 0, activityViewSize, activityViewSize))
+    private let pullThreshold = -activityViewSize
 
     public var reloading = false
 
@@ -22,13 +24,14 @@ public class StoryTableViewController: UITableViewController {
         self.tableView.allowsMultipleSelectionDuringEditing = false;
         
         // add a pretty image to the navigation bar
-        let navBar: UINavigationBar = self.navigationController!.navigationBar
-        navBar.setBackgroundImage(UIImage(named: "WaterTop.png")?.resizableImageWithCapInsets(UIEdgeInsetsMake(0, 0, 0, 0), resizingMode: .Stretch), forBarMetrics: .Default)
+        if let navBar = self.navigationController?.navigationBar {
+            navBar.setBackgroundImage(UIImage(named: "WaterTop.png")?.resizableImageWithCapInsets(UIEdgeInsetsMake(0, 0, 0, 0), resizingMode: .Stretch), forBarMetrics: .Default)
+        }
         
         // install the activity view as the table header, but hide it initially
         self.tableView.tableHeaderView = activityView
         let insets = self.tableView.contentInset;
-        let newInsets: UIEdgeInsets = UIEdgeInsetsMake(insets.top-40, insets.left, insets.bottom, insets.right)
+        let newInsets: UIEdgeInsets = UIEdgeInsetsMake(insets.top - StoryTableViewController.activityViewSize, insets.left, insets.bottom, insets.right)
         self.tableView.contentInset = newInsets;
 
         // register to get notified when the story list is populated or changes
@@ -49,14 +52,13 @@ public class StoryTableViewController: UITableViewController {
         
         // expose the activity indicator just above the table
         let insets = self.tableView.contentInset;
-        let newInsets: UIEdgeInsets = UIEdgeInsetsMake(insets.top+40, insets.left, insets.bottom, insets.right)
+        let newInsets: UIEdgeInsets = UIEdgeInsetsMake(insets.top+StoryTableViewController.activityViewSize, insets.left, insets.bottom, insets.right)
         self.tableView.contentInset = newInsets;
         
         activityView.startAnimating()
     }
         
     // this function supports pulling down on the table to initiate a refresh
-    private let pullThreshold = -40.0 as CGFloat
     override public func scrollViewDidScroll(scrollView: UIScrollView) {
         
         if scrollView.contentOffset.y < self.pullThreshold && !reloading {
@@ -81,13 +83,11 @@ public class StoryTableViewController: UITableViewController {
     public func getImageURL(content: String) -> NSURL? {
         
         var returnURL: NSURL?
-        var range: Range<String.Index>? = content.rangeOfString("img src=\"")
         
-        if range != nil {
-            var imagePath = content.substringFromIndex(range!.endIndex) as String
-            range = imagePath.rangeOfString("\"")
-            if range != nil {
-                imagePath = "http:" + imagePath.substringToIndex(range!.startIndex)
+        if let range = content.rangeOfString("img src=\"") {
+            var imagePath = content.substringFromIndex(range.endIndex) as String
+            if let range = imagePath.rangeOfString("\"") {
+                imagePath = "http:" + imagePath.substringToIndex(range.startIndex)
                 returnURL = NSURL(string:imagePath)
             }
         }
@@ -102,6 +102,7 @@ public class StoryTableViewController: UITableViewController {
             dispatch_async(dispatch_get_main_queue()) {
                 if let image = UIImage(data: response.data!) {
                     imageView.image = image;
+                    
                 }
             }
         }
@@ -134,14 +135,14 @@ public class StoryTableViewController: UITableViewController {
         }
 
         let newsItem = StoryManager.sharedInstance.allNewsItems[indexPath.row]
-        cell.titleLabel!.text = newsItem.title
-        cell.subtitleLabel!.text = newsItem.snippet
+        cell.newsItem = newsItem
         
         // set a default initial image in case none is available or the download fails
-        cell.customImageView!.image = UIImage(named: "ImagePlaceholder160.png")!
+        cell.setStoryImage(nil)
         
-        if let imageURL = getImageURL(newsItem.imageURL) {
-            startImageDownload(imageURL, imageView: cell.customImageView!)
+        // now asynchronously retrieve the image
+        if let imageURL = getImageURL(newsItem.imageURL), let storyImageView = cell.customImageView {
+            startImageDownload(imageURL, imageView: storyImageView)
         }
         
         return cell
@@ -169,7 +170,7 @@ extension StoryTableViewController: StoryListener {
         
         UIView.animateWithDuration(0.4, animations: {
             let insets = self.tableView.contentInset;
-            let newInsets: UIEdgeInsets = UIEdgeInsetsMake(insets.top-CGFloat(40), insets.left, insets.bottom, insets.right)
+            let newInsets: UIEdgeInsets = UIEdgeInsetsMake(insets.top-StoryTableViewController.activityViewSize, insets.left, insets.bottom, insets.right)
             self.tableView.contentInset = newInsets;
         })
         

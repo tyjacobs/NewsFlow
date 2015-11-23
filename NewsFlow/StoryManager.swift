@@ -151,7 +151,13 @@ public class StoryManager: NSObject, NSURLConnectionDelegate {
                 newsItem.link = link
                 newsItem.snippet = snippet
                 newsItem.imageURL = content
-                newsItem.dateStamp = publishedDate!
+                
+                if let publishedDate = publishedDate {
+                    newsItem.dateStamp = publishedDate
+                }
+                else {
+                    newsItem.dateStamp = NSDate()
+                }
                 
                 var error: NSError?
                 do {

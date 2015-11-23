@@ -10,6 +10,7 @@
 		08D114841AF61F59A6E164FD /* Pods.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B509EB0E1E018F0CB5F1C501 /* Pods.framework */; };
 		D887FA8A1C0297880007C718 /* CoreDataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D887FA891C0297880007C718 /* CoreDataManager.swift */; };
 		D887FA8B1C0297880007C718 /* CoreDataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D887FA891C0297880007C718 /* CoreDataManager.swift */; };
+		D8CC671C1C035EE900D8990D /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D8CC671B1C035EE900D8990D /* WebKit.framework */; };
 		D8E650CC1B66AEBF001805A9 /* NewsFlow.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = D8E650CA1B66AEBF001805A9 /* NewsFlow.xcdatamodeld */; };
 		D8E650D31B66AEBF001805A9 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D8E650D21B66AEBF001805A9 /* Images.xcassets */; };
 		D8E650E21B66AEBF001805A9 /* NewsFlowTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8E650E11B66AEBF001805A9 /* NewsFlowTests.swift */; };
@@ -42,6 +43,7 @@
 		B509EB0E1E018F0CB5F1C501 /* Pods.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		BA526998DE773AABAD3153A5 /* Pods.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.release.xcconfig; path = "Pods/Target Support Files/Pods/Pods.release.xcconfig"; sourceTree = "<group>"; };
 		D887FA891C0297880007C718 /* CoreDataManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoreDataManager.swift; sourceTree = "<group>"; };
+		D8CC671B1C035EE900D8990D /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
 		D8E650C31B66AEBF001805A9 /* NewsFlow.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NewsFlow.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D8E650C71B66AEBF001805A9 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		D8E650CB1B66AEBF001805A9 /* NewsFlow.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = NewsFlow.xcdatamodel; sourceTree = "<group>"; };
@@ -69,6 +71,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D8CC671C1C035EE900D8990D /* WebKit.framework in Frameworks */,
 				08D114841AF61F59A6E164FD /* Pods.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -86,6 +89,7 @@
 		206E92C648571B80B23B8ACB /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				D8CC671B1C035EE900D8990D /* WebKit.framework */,
 				B509EB0E1E018F0CB5F1C501 /* Pods.framework */,
 			);
 			name = Frameworks;
